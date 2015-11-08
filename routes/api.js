@@ -1,11 +1,18 @@
 var express = require('express'),
     poll = require('../models/poll'),
-    plivo = require('../components/plivo')(),
+    plivo = new (require('../components/plivo'))(),
     router = express.Router();
 
 router.get('/incoming_message', function(req, res, next) {
     var sms = plivo.receiveMessage(req);
-    // find the poll and poll option
+    poll.submitVote(sms.from, sms.to, sms.text, function(err, res) {
+        if (err) {
+            next();
+        } else {
+            plivo.sendMessage(sms.to, sms.from, 'Thank you for voting!');
+            next();
+        }
+    })
 });
 
 router.get('/poll_results', function(req, res, next) {

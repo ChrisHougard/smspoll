@@ -14,9 +14,15 @@ var Plivo = function(authId, authToken) {
     } else {
         this.authToken = process.env["PLIVO_AUTH_TOKEN"];
     }
+
+    return this;
 };
 
 function validateSignature(req, authToken) {
+    if (process.env["PLIVO_DEBUG"]) {
+        return true;
+    }
+
     var params;
     if (req.method === 'POST') {
         params = req.body;
